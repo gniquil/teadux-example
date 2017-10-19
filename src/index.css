@@ -1,0 +1,18 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+.App {
+  padding: 4em;
+}
+
+.App .counters {
+  display: flex;
+}
+
+.Counter {
+  margin: 1em;
+  text-align: center;
+}
