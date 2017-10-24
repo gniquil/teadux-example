@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { connect, Dispatch } from 'react-redux';
-import { Cmd, CmdType, wrap } from 'teadux';
+import { Cmds, Command, mcompose } from 'teadux';
 import * as counter from './counter';
 const { Counter } = counter;
 
@@ -20,30 +20,35 @@ export type Action = First | Second | Init;
 
 export type First = {
   type: 'First';
-  subAction: counter.Action;
+  nested: counter.Action;
 };
 
-export function tagFirst(subAction: counter.Action): Action {
-  return { type: 'First', subAction };
+export function tagFirst(nested: counter.Action): Action {
+  return { type: 'First', nested };
 }
 
 export type Second = {
   type: 'Second';
-  subAction: counter.Action;
+  nested: counter.Action;
 };
 
-export function tagSecond(subAction: counter.Action): Action {
-  return { type: 'Second', subAction };
+export function tagSecond(nested: counter.Action): Action {
+  return { type: 'Second', nested };
 }
 
 export type Init = {
   type: '@@INIT';
 };
 
+export type Deps = counter.Deps;
+
+export const deps: Deps = counter.deps;
+
 export function reducer(
   state: State = initialState,
-  action: Action
-): [State, CmdType<Action>[]] {
+  action: Action,
+  { doConvert }: Deps
+): [State, Command<Action>[]] {
   switch (action.type) {
     case '@@INIT': {
       return [state, []];
@@ -51,7 +56,8 @@ export function reducer(
     case 'First': {
       const [subState, subCmds, subInfo] = counter.reducer(
         state.firstCounter,
-        action.subAction
+        action.nested,
+        { doConvert }
       );
       return [
         {
@@ -59,13 +65,14 @@ export function reducer(
           firstCounter: subState,
           totalCount: state.totalCount + (subInfo ? subInfo.current : 0),
         },
-        [...Cmd.map(tagFirst, subCmds)],
+        [...Cmds.fmap(tagFirst, subCmds)],
       ];
     }
     case 'Second': {
       const [subState, subCmds, subInfo] = counter.reducer(
-        state.firstCounter,
-        action.subAction
+        state.secondCounter,
+        action.nested,
+        { doConvert }
       );
       return [
         {
@@ -73,7 +80,7 @@ export function reducer(
           secondCounter: subState,
           totalCount: state.totalCount + (subInfo ? subInfo.current : 0),
         },
-        [...Cmd.map(tagSecond, subCmds)],
+        [...Cmds.fmap(tagSecond, subCmds)],
       ];
     }
   }
@@ -90,8 +97,8 @@ type DispatchProps = {
 const mapStateToProps = (state: State): StateProps => ({ state });
 
 class App extends React.Component<StateProps & DispatchProps, {}> {
-  dispatchFirst = wrap(this.props.dispatch, tagFirst);
-  dispatchSecond = wrap(this.props.dispatch, tagSecond);
+  dispatchFirst = mcompose(this.props.dispatch, tagFirst);
+  dispatchSecond = mcompose(this.props.dispatch, tagSecond);
 
   render() {
     const { state: { totalCount, firstCounter, secondCounter } } = this.props;

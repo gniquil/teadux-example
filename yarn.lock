@@ -4556,7 +4556,7 @@ repeat-element@^1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/repeat-element/-/repeat-element-1.1.2.tgz#ef089a178d1483baae4d93eb98b4f9e4e11d990a"
 
-repeat-string@^1.5.2:
+repeat-string@^1.5.2, repeat-string@^1.6.1:
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/repeat-string/-/repeat-string-1.6.1.tgz#8dcae470e1c88abc2d600fff4a776286da75e637"
 
@@ -4678,6 +4678,12 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
   dependencies:
     hash-base "^2.0.0"
     inherits "^2.0.1"
+
+romanize@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/romanize/-/romanize-1.1.1.tgz#c956fa1387641c8372703077a0099cd1b7d70c1c"
+  dependencies:
+    repeat-string "^1.6.1"
 
 run-async@^2.2.0:
   version "2.3.0"
@@ -5181,9 +5187,9 @@ tar@^2.2.1:
     fstream "^1.0.2"
     inherits "2"
 
-teadux@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/teadux/-/teadux-1.0.1.tgz#f6b104556360c72fa4ed726af231fe6a6cc7e3b7"
+teadux@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/teadux/-/teadux-1.2.0.tgz#f899362889b408ae5b626ab84bf531d5c796c059"
 
 test-exclude@^4.1.1:
   version "4.1.1"

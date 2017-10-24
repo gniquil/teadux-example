@@ -15,7 +15,8 @@
     "react-dom": "^16.0.0",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
-    "teadux": "^1.0.1"
+    "romanize": "^1.1.1",
+    "teadux": "^1.2.0"
   },
   "scripts": {
     "start": "react-scripts-ts start",

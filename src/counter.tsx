@@ -1,5 +1,13 @@
 import * as React from 'react';
-import { Cmd, CmdType, Dispatch, wrap } from 'teadux';
+import {
+  Cmd,
+  Command,
+  actionCreator,
+  effect,
+  Dispatch,
+  mcompose,
+} from 'teadux';
+const romanize = require('romanize');
 
 export type State = {
   counter: number;
@@ -39,18 +47,27 @@ export type Info = {
   current: number;
 };
 
+export type Deps = {
+  doConvert: (n: number) => Promise<string>;
+};
+
+export const deps: Deps = {
+  doConvert: convert,
+};
+
 export function reducer(
   state: State = initialState,
-  action: Action
-): [State, CmdType<Action>[], Info | null] {
+  action: Action,
+  { doConvert }: Deps
+): [State, Command<Action>[], Info | null] {
   switch (action.type) {
     case 'Increment': {
       const counter = state.counter + 1;
       return [
         { ...state, counter },
         [
-          Cmd.run(Cmd.fn(doConvert, counter), {
-            success: Cmd.fn(update),
+          Cmd.run(effect(doConvert, counter), {
+            success: actionCreator(update),
           }),
         ],
         { current: counter },
@@ -61,8 +78,8 @@ export function reducer(
       return [
         { ...state, counter },
         [
-          Cmd.run(Cmd.fn(doConvert, counter), {
-            success: Cmd.fn(update),
+          Cmd.run(effect(doConvert, counter), {
+            success: actionCreator(update),
           }),
         ],
         { current: counter },
@@ -74,28 +91,19 @@ export function reducer(
   }
 }
 
-function doConvert(n: number): Promise<string> {
-  switch (n) {
-    case 0:
-      return Promise.resolve('zero');
-    case 1:
-      return Promise.resolve('one');
-    case 2:
-      return Promise.resolve('two');
-    case 3:
-      return Promise.resolve('three');
-    case 4:
-      return Promise.resolve('four');
-    case -1:
-      return Promise.resolve('neg one');
-    case -2:
-      return Promise.resolve('neg two');
-    case -3:
-      return Promise.resolve('neg three');
-    case -4:
-      return Promise.resolve('neg four');
-    default:
-      return Promise.resolve('what?');
+function delay(n: number): Promise<void> {
+  return new Promise(resolve => {
+    setTimeout(resolve, n);
+  });
+}
+
+function convert(n: number): Promise<string> {
+  if (n < 0) {
+    return delay(1000).then(() => `NEG ${romanize(Math.abs(n))}`);
+  } else if (n === 0) {
+    return delay(1000).then(() => 'ZERO');
+  } else {
+    return delay(1000).then(() => romanize(n));
   }
 }
 
@@ -106,8 +114,8 @@ export const Counter = ({
   state: { counter, comment },
   dispatch,
 }: Props) => {
-  const up = wrap(dispatch, increment);
-  const down = wrap(dispatch, decrement);
+  const up = mcompose(dispatch, increment);
+  const down = mcompose(dispatch, decrement);
   return (
     <div className="Counter">
       <h3>{name}</h3>
